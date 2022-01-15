@@ -2,6 +2,7 @@ import { useState } from "react/cjs/react.development";
 import { SpeakerFilterContext } from "../contexts/SpeakerFilterContext";
 import { useContext } from "react/cjs/react.development";
 import { SpeakerProvider, SpeakerContext } from "../contexts/SpeakerContext";
+import SpeakerDelete from "./SpeakerDelete";
 
 const Session = ({ title, room }) => (
   <span className="session w-100">
@@ -75,8 +76,8 @@ const SpeakerFavorite = () => {
 };
 
 function SpeakerDemographics() {
-  const speaker = useContext(SpeakerContext);
-  const { first, last, bio, company, twitterHandle, favorite } = speaker;
+  const { speaker } = useContext(SpeakerContext);
+  const { first, last, bio, company, twitterHandle } = speaker;
 
   return (
     <div className="speaker-info">
@@ -103,17 +104,23 @@ function SpeakerDemographics() {
   );
 }
 
-function Speaker({ speaker, updateRecord }) {
+function Speaker({ speaker, updateRecord, insertRecord, deleteRecord }) {
   const { showSessions } = useContext(SpeakerFilterContext);
 
   return (
-    <SpeakerProvider speaker={speaker} updateRecord={updateRecord}>
+    <SpeakerProvider
+      speaker={speaker}
+      updateRecord={updateRecord}
+      insertRecord={insertRecord}
+      deleteRecord={deleteRecord}
+    >
       <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4">
         <div className="card card-height p-4 mt-4">
           <SpeakerImage />
           <SpeakerDemographics />
         </div>
         {showSessions && <Sessions />}
+        <SpeakerDelete />
       </div>
     </SpeakerProvider>
   );
