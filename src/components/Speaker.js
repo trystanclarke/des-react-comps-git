@@ -1,6 +1,7 @@
 import { useState } from "react/cjs/react.development";
 import { SpeakerFilterContext } from "../contexts/SpeakerFilterContext";
 import { useContext } from "react/cjs/react.development";
+import { SpeakerProvider, SpeakerContext } from "../contexts/SpeakerContext";
 
 const Session = ({ title, room }) => (
   <span className="session w-100">
@@ -8,8 +9,10 @@ const Session = ({ title, room }) => (
   </span>
 );
 
-const Sessions = ({ sessions }) => {
+const Sessions = () => {
   const { eventYear } = useContext(SpeakerFilterContext);
+  const { speaker } = useContext(SpeakerContext);
+  const sessions = speaker.sessions;
 
   return (
     <div className="sessionBox card h-250">
@@ -22,18 +25,24 @@ const Sessions = ({ sessions }) => {
   );
 };
 
-const SpeakerImage = ({ id, first, last }) => (
-  <div className="speaker-img d-flex flex-row justify-content-center align-items-center h-300">
-    <img
-      className="contain-fit"
-      src={`/images/speaker-${id}.jpg`}
-      width="300"
-      alt={`${first} ${last}`}
-    />
-  </div>
-);
+const SpeakerImage = () => {
+  const { speaker } = useContext(SpeakerContext);
+  const { id, first, last } = speaker;
 
-const SpeakerFavorite = ({ favorite, onFavoriteToggle }) => {
+  return (
+    <div className="speaker-img d-flex flex-row justify-content-center align-items-center h-300">
+      <img
+        className="contain-fit"
+        src={`/images/speaker-${id}.jpg`}
+        width="300"
+        alt={`${first} ${last}`}
+      />
+    </div>
+  );
+};
+
+const SpeakerFavorite = () => {
+  const { speaker, updateRecord } = useContext(SpeakerContext);
   const [inTransition, setInTransition] = useState(false);
   const doneCallback = () => {
     setInTransition(false);
@@ -47,10 +56,17 @@ const SpeakerFavorite = ({ favorite, onFavoriteToggle }) => {
       <span
         onClick={() => {
           setInTransition(true);
-          onFavoriteToggle(doneCallback);
+          updateRecord(
+            { ...speaker, favorite: !speaker.favorite },
+            doneCallback
+          );
         }}
       >
-        <i className={favorite ? "fa fa-star orange" : "fa fa-star-o orange"} />{" "}
+        <i
+          className={
+            speaker.favorite ? "fa fa-star orange" : "fa fa-star-o orange"
+          }
+        />{" "}
         Favourite{" "}
         {inTransition && <span className="fas fa-circle-notch fa-spin"></span>}
       </span>
@@ -58,15 +74,10 @@ const SpeakerFavorite = ({ favorite, onFavoriteToggle }) => {
   );
 };
 
-function SpeakerDemographics({
-  first,
-  last,
-  bio,
-  company,
-  twitterHandle,
-  favorite,
-  onFavoriteToggle,
-}) {
+function SpeakerDemographics() {
+  const speaker = useContext(SpeakerContext);
+  const { first, last, bio, company, twitterHandle, favorite } = speaker;
+
   return (
     <div className="speaker-info">
       <div className="d-flex justify-content-between mb-3">
@@ -74,10 +85,7 @@ function SpeakerDemographics({
           {first} {last}
         </h3>
       </div>
-      <SpeakerFavorite
-        favorite={favorite}
-        onFavoriteToggle={onFavoriteToggle}
-      />
+      <SpeakerFavorite />
       <div>
         <p className="card-description">{bio}</p>
         <div className="social d-flex flex-row mt-4">
@@ -95,18 +103,19 @@ function SpeakerDemographics({
   );
 }
 
-function Speaker({ speaker, onFavoriteToggle }) {
+function Speaker({ speaker, updateRecord }) {
   const { showSessions } = useContext(SpeakerFilterContext);
-  const { id, first, last, sessions } = speaker;
 
   return (
-    <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4">
-      <div className="card card-height p-4 mt-4">
-        <SpeakerImage id={id} first={first} last={last} />
-        <SpeakerDemographics {...speaker} onFavoriteToggle={onFavoriteToggle} />
+    <SpeakerProvider speaker={speaker} updateRecord={updateRecord}>
+      <div className="col-xs-12 col-sm-12 col-md-6 col-lg-4">
+        <div className="card card-height p-4 mt-4">
+          <SpeakerImage />
+          <SpeakerDemographics />
+        </div>
+        {showSessions && <Sessions />}
       </div>
-      {showSessions && <Sessions sessions={sessions} />}
-    </div>
+    </SpeakerProvider>
   );
 }
 
