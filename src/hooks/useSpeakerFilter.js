@@ -1,4 +1,4 @@
-import { useState } from "react/cjs/react.development";
+import { useState } from "react";
 
 const useSpeakerFilter = (startingShowSessions = false, startingEventYear) => {
   const [showSessions, setShowSessions] = useState(startingShowSessions);

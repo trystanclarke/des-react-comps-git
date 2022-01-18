@@ -1,8 +1,6 @@
 import Speaker from "./Speaker";
 import ReactPlaceholder from "react-placeholder/lib";
-//import useRequestDelay, { REQUEST_STATUS } from "../hooks/useRequestDelay";
-//import { data } from "../../SpeakerData";
-import { useContext } from "react/cjs/react.development";
+import { useContext } from "react";
 import { SpeakerFilterContext } from "../contexts/SpeakerFilterContext";
 import SpeakerAdd from "./SpeakerAdd";
 import useRequestRest, { REQUEST_STATUS } from "../hooks/useRequestRest";
